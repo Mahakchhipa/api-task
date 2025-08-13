@@ -8,37 +8,41 @@ const Api = () => {
   const [sortType, setSortType] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
 
   const navigate = useNavigate();
+  const isLoggedIn = localStorage.getItem("userToken");
 
   const fetchData = async () => {
     try {
-      const result = await axios.get("https://fakestoreapi.in/api/products");
-      console.log("api data", result.data.products);
-      setData(result.data.products);
+      const result = await axios.get("https://dummyjson.com/recipes");
+      console.log("API data", result.data.recipes);
+      setData(result.data.recipes);
     } catch (error) {
-      console.log("error fetching data", error);
+      console.log("Error fetching data", error);
     }
   };
-
+const logout = ()=>{ 
+      localStorage.clear()
+}
   useEffect(() => {
     fetchData();
   }, []);
 
-  const categories = ["All", "Gaming", "Audio", "Mobile", "TV"];
+  const categories = ["All", ...new Set(data.flatMap((item) => item.mealType))];
 
   const filteredData = data
     .filter((item) =>
       selectedCategory === "All"
         ? true
-        : item.category.toLowerCase().includes(selectedCategory.toLowerCase())
+        : item.mealType.some(
+            (type) => type.toLowerCase() === selectedCategory.toLowerCase()
+          )
     )
-    .filter((item) => item.title.toLowerCase().includes(search.toLowerCase()))
+    .filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
-      if (sortType === "low") return a.price - b.price;
-      if (sortType === "high") return b.price - a.price;
-      if (sortType === "atoz") return a.title.localeCompare(b.title);
-      if (sortType === "ztoa") return b.title.localeCompare(a.title);
+      if (sortType === "atoz") return a.name.localeCompare(b.name);
+      if (sortType === "ztoa") return b.name.localeCompare(a.name);
       return 0;
     });
 
@@ -50,9 +54,32 @@ const Api = () => {
     }
   };
 
+  const toggleWishlist = (id) => {
+    if (!isLoggedIn) {
+      alert("Please login first to add items to wishlist!");
+      navigate("/login");
+      return;
+    }
+    if (wishlist.includes(id)) {
+      setWishlist(wishlist.filter((itemId) => itemId !== id));
+    } else {
+      setWishlist([...wishlist, id]);
+    }
+  };
+
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <h1 className="text-center text-3xl text-blue-900 font-bold  italic py-5 "> React Api Task  </h1>
+      <h1 className="text-center text-3xl text-blue-900 font-bold italic py-5">
+        Recipes Dishesh 
+      </h1>
+      <div>
+        {" "}
+        <button className="justify-end flex bg-amber-400 text-xl hover:bg-amber-900 text-white font-bold p-5 rounded-2xl">
+          {" "}
+          Add To wishlist
+        </button>{" "} 
+         <button className=" text[-xl bg-blue-200 text-black border-2 p-4 my-6 " onClick={logout}> Log Out </button>
+      </div>
 
       <div
         style={{
@@ -64,7 +91,7 @@ const Api = () => {
       >
         <input
           type="text"
-          placeholder="Search products..."
+          placeholder="Search recipes..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
@@ -84,10 +111,8 @@ const Api = () => {
           }}
         >
           <option value="">Sort</option>
-          <option value="low"> Low To High</option>
-          <option value="high"> High To Low</option>
-          <option value="atoz"> A to Z</option>
-          <option value="ztoa"> Z to A</option>
+          <option value="atoz">A to Z</option>
+          <option value="ztoa">Z to A</option>
         </select>
       </div>
 
@@ -96,24 +121,25 @@ const Api = () => {
           display: "flex",
           justifyContent: "center",
           gap: "10px",
+          flexWrap: "wrap",
           marginBottom: "20px",
         }}
       >
-        {categories.map((cat) => (
+        {categories.map((data) => (
           <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
+            key={data}
+            onClick={() => setSelectedCategory(data)}
             style={{
               padding: "10px 15px",
               borderRadius: "20px",
               border: "none",
-              backgroundColor: selectedCategory === cat ? "#007bff" : "#ccc",
-              color: selectedCategory === cat ? "#fff" : "#000",
+              backgroundColor: selectedCategory === data ? "#007bff" : "#ccc",
+              color: selectedCategory === data ? "#fff" : "#000",
               cursor: "pointer",
               fontWeight: "bold",
             }}
           >
-            {cat}
+            {data}
           </button>
         ))}
       </div>
@@ -142,28 +168,43 @@ const Api = () => {
             >
               <img
                 src={item.image}
-                alt={item.title}
+                alt={item.name}
                 style={{
-                  width: "100px",
-                  height: "100px",
-                  objectFit: "contain",
+                  width: "200px",
+                  height: "120px",
+                  objectFit: "cover",
                   marginBottom: "10px",
+                  borderRadius: "8px",
                 }}
               />
               <h3
-                style={{ fontSize: "14px", height: "40px", overflow: "hidden" }}
+                style={{
+                  fontSize: "15px",
+                  color: "#999",
+                  height: "40px",
+                  overflow: "hidden",
+                }}
               >
-                {item.title}
+                {item.name}
               </h3>
-              <p style={{ color: "#007bff", fontWeight: "bold" }}>
-                ₹{item.price}
+              <p style={{ fontSize: "15px", color: "#DC143C" }}>
+                {item.cuisine}
               </p>
-              <p style={{ fontSize: "12px", color: "#777" }}>{item.category}</p>
-
+              <p style={{ fontSize: "15px", color: "#777" }}>
+                {" "}
+                Rating: {item.rating}
+              </p>
+              <p style={{ fontSize: "13px", color: "#B8860B" }}>
+                Kitna Time Lagega: {item.prepTimeMinutes}
+              </p>
+              <p style={{ fontSize: "10px", color: "#F08080" }}>
+                {" "}
+                Type {item.tags}
+              </p>
               <button
                 onClick={() => toggleCart(item.id)}
                 style={{
-                  padding: "8px 12px",
+                  padding: "10px 12px",
                   border: "none",
                   borderRadius: "5px",
                   cursor: "pointer",
@@ -174,10 +215,30 @@ const Api = () => {
               >
                 {cart.includes(item.id) ? "Remove from Cart" : "Add to Cart"}
               </button>
+
+              <button
+                onClick={() => toggleWishlist(item.id)}
+                style={{
+                  padding: "8px 12px",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  backgroundColor: wishlist.includes(item.id)
+                    ? "orange"
+                    : "#555",
+                  color: "#fff",
+                  marginTop: "10px",
+                  marginLeft: "5px",
+                }}
+              >
+                {wishlist.includes(item.id)
+                  ? "Remove from Wishlist"
+                  : "Add to Wishlist"}
+              </button>
             </div>
           ))
         ) : (
-          <p>No products found ja kuch n bacha tere liye ab 😊🫂</p>
+          <p>No Data Found </p>
         )}
       </div>
     </div>

@@ -29,7 +29,7 @@ alert("User registered!");
   }
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 to-blue-200 px-4">
-      <h1 className="text-4xl font-bold text-blue-600 mb-8">Sign Up Form</h1>
+      <h1 className="text-4xl font-bold text-blue-600 mb-8"> User Sign Form Data </h1>
 
       <form
         onSubmit={handleSubmit}
