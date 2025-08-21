@@ -9,6 +9,7 @@ const Header = () => {
         <Link  to={"/login"}>  Login </Link> 
          <Link  to={"/signup"}>  SignUp </Link> 
            <Link  to={"/api"}>  ApiData </Link> 
+             <Link  to={"/fetch"}>  Fetch </Link> 
     </div>
   );
 };

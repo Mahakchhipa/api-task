@@ -4,7 +4,7 @@ const About = () => {
   const [country, setCountry] = useState("");
   const [city, setCity] = ("");
   const [state, setState] = useState("");
-
+ 
   const data = {
     india: {
       states: {

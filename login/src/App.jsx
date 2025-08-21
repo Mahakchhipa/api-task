@@ -9,6 +9,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import NotFoundPage from './components/NotFoundPage'
 import Api from './components/Api'
+import Fetch from './components/Fetch'
 const App = () => {
   return (
     
@@ -22,6 +23,7 @@ const App = () => {
    <Route path="/signup" element={<SignUpForm/>} ></Route>
      <Route path="/api" element={<Api/>} ></Route>
    <Route path='*' element={<NotFoundPage/>}></Route>
+    <Route path='/fetch' element={<Fetch/>}></Route>
     </Routes>
     <Footer/>
     </BrowserRouter>
